@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption.Benchmark", "Encryption.Benchmark\Encryption.Benchmark.csproj", "{59E9D1C9-C17D-43A7-8A3E-7BF1FF44BE3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption.Common", "Encryption.Common\Encryption.Common.csproj", "{323ACACE-1856-4E13-AA04-0A9B8C396901}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption.Engine", "Encryption.Engine\Encryption.Engine.csproj", "{A198CDE1-69E6-4DF2-BDF9-2EB66A02B73D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Encryption.Tests", "Encryption.Tests\Encryption.Tests.csproj", "{2633496D-58F0-4449-BE57-47AC56651A17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59E9D1C9-C17D-43A7-8A3E-7BF1FF44BE3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E9D1C9-C17D-43A7-8A3E-7BF1FF44BE3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E9D1C9-C17D-43A7-8A3E-7BF1FF44BE3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E9D1C9-C17D-43A7-8A3E-7BF1FF44BE3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{323ACACE-1856-4E13-AA04-0A9B8C396901}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{323ACACE-1856-4E13-AA04-0A9B8C396901}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{323ACACE-1856-4E13-AA04-0A9B8C396901}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{323ACACE-1856-4E13-AA04-0A9B8C396901}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A198CDE1-69E6-4DF2-BDF9-2EB66A02B73D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A198CDE1-69E6-4DF2-BDF9-2EB66A02B73D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A198CDE1-69E6-4DF2-BDF9-2EB66A02B73D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A198CDE1-69E6-4DF2-BDF9-2EB66A02B73D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2633496D-58F0-4449-BE57-47AC56651A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2633496D-58F0-4449-BE57-47AC56651A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2633496D-58F0-4449-BE57-47AC56651A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2633496D-58F0-4449-BE57-47AC56651A17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
