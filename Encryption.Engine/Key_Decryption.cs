@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Encryption.Engine;
+﻿namespace Encryption.Engine;
 
 public class Key_Decryption
 {
@@ -9,6 +7,10 @@ public class Key_Decryption
         var blocked_data = Get_Blocked_Data(data, key.Length);
         var times = BitConverter.ToInt32(data, data.Length - 8);
         var org_length = BitConverter.ToInt32(data, data.Length - 4);
+
+        Decrypt_Block(blocked_data[^1], key, blocked_data[^2]);
+        if (blocked_data[^1].Any(d => d != 0))
+            throw new Exception();
 
         Decrypt(blocked_data, key, times);
 
