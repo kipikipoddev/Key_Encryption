@@ -29,4 +29,15 @@ public class Unit_Tests
 
         Assert.That(data, Is.EqualTo(decrypted));
     }
+
+    [Test]
+    public void IV_Test()
+    {
+        var data = random.Get_Random_Bytes(16);
+
+        var encrypted = Key_Encryption.Encrypt(data, key, 16);
+        var encrypted2 = Key_Encryption.Encrypt(data, key, 16);
+
+        Assert.That(encrypted[0], Is.Not.EqualTo(encrypted2[0]));
+    }
 }
