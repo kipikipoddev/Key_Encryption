@@ -1,45 +1,73 @@
-﻿using System.Collections.Generic;
+﻿using System.Security.Cryptography;
 
 namespace Encryption.Engine;
 
 public class Key_Encryption
 {
-    private const int Meta_Data = 2;
-
-    private readonly static Random random = new();
-
     public static byte[] Encrypt(byte[] data, byte[] key, byte times)
     {
-        var first = (byte)random.Next();
-        Array.Resize(ref data, data.Length + Meta_Data);
+        var iv = Get_Iv(key.Length);
+        var org_length = data.Length;
 
-        for (int x = 0; x < times; x++)
-            for (int i = 0; i < data.Length - Meta_Data; i++)
-                data[i] += Get_Extra(data, key, first, i);
+        Array.Resize(ref data, data.Length + 1 + key.Length);
 
-        data[^2] = times;
-        data[^1] = first;
+        Process_Data(data, key, times, iv);
+
+        data[org_length] = times;
+        for (int i = 0; i < key.Length; i++)
+            data[org_length + i + 1] = iv[i];
+
+        //for (int i = 0; i < key.Length; i++)
+
         return data;
     }
 
     public static byte[] Decrypt(byte[] data, byte[] key)
     {
-        var times = data[^2];
-        var first = data[^1];
+        var org_length = data.Length - key.Length - 1;
+        var times = data[org_length];
+        var iv = new byte[key.Length];
+        for (int i = 0; i < key.Length; i++)
+            data[org_length + 1 + i] = iv[i];
 
-        Array.Resize(ref data, data.Length - Meta_Data);
+        Array.Resize(ref data, org_length);
 
-        for (int x = 0; x < times; x++)
-            for (int i = data.Length - 1; i >= 0; i--)
-                data[i] -= Get_Extra(data, key, first, i);
+        Process_Data(data, key, times, iv);
 
         return data;
     }
 
-    private static byte Get_Extra(byte[] data, byte[] key, byte first, int i)
+    private static void Process_Data(byte[] data, byte[] key, byte times, byte[] iv)
     {
-        var prefix = (i > 0 ? data[i - 1] : first);
-        var suffix =  key[i % key.Length];
-        return (byte)(prefix + suffix);
+        for (int t = 0; t < times; t++)
+            for (int b = 0; b < data.Length % key.Length; b++)
+                Process_Block(data, key, iv, b);
+    }
+
+    private static void Process_Block(byte[] data, byte[] key, byte[] iv, int b)
+    {
+        var index = b * key.Length;
+        var encrypted = Get_Encrypted(data, key, iv, index);
+        var i = 0;
+        foreach (var e in encrypted)
+            data[index + (i++)] = e;
+    }
+
+    private static IEnumerable<byte> Get_Encrypted(byte[] data, byte[] key, byte[] iv, int index)
+    {
+        var prev_index = index - key.Length;
+        var length = Math.Min(key.Length, data.Length - index);
+        for (int i = 0; i < length; i++)
+            yield return (byte)(key[i] ^ data[index + i] ^ (index == 0 ? iv[i] : data[prev_index + i]));
+    }
+
+    private static byte[] Get_Iv(int length)
+    {
+        var randomBytes = new byte[length];
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(randomBytes);
+        }
+        return randomBytes;
     }
 }

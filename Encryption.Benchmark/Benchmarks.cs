@@ -6,8 +6,8 @@ namespace Encryption.Benchmark;
 
 public class Benchmarks
 {
-    private const int Scale = 100_000;
-    private const int Times = 32;
+    private const int Scale = 1_000_000;
+    private const int Times = 128;
 
     private readonly Random random;
     private readonly byte[] key;
@@ -17,7 +17,7 @@ public class Benchmarks
     public Benchmarks()
     {
         random = new();
-        key = random.Get_Random_Bytes(32);
+        key = random.Get_Random_Bytes(16);
         data = random.Get_Random_Bytes(Scale);
         encrypted = Key_Encryption.Encrypt(data, key, Times);
     }

@@ -11,4 +11,10 @@
     <ProjectReference Include="..\Encryption.Common\Encryption.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Advanced_Encryption_Standard.pdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

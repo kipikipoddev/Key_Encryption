@@ -12,17 +12,19 @@ public class Unit_Tests
     public void Setup()
     {
         random = new();
-        key = random.Get_Random_Bytes(32);
+        key = random.Get_Random_Bytes(16);
     }
 
+    [TestCase(10)]
     [TestCase(100)]
     [TestCase(1_000)]
     [TestCase(10_000)]
+    [TestCase(100_000)]
     public void Key_Encryption_Test(int length)
     {
         var data = random.Get_Random_Bytes(length);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 200);
+        var encrypted = Key_Encryption.Encrypt(data, key, 128);
         var decrypted = Key_Encryption.Decrypt(encrypted, key);
 
         Assert.That(data, Is.EqualTo(decrypted));
