@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Encryption.Engine;
 
@@ -38,25 +39,31 @@ public class Key_Encryption
     private static void Process_Data(byte[] data, byte[] key, byte times, byte[] iv)
     {
         for (int t = 0; t < times; t++)
-            for (int block = 0; block <= data.Length % key.Length; block++)
-                Process_Block(data, key, iv, block);
+            for (int block = 0; block < data.Length / key.Length + 1; block++)
+                Process_Block(data, key, iv, block, t == 0);
     }
 
-    private static void Process_Block(byte[] data, byte[] key, byte[] iv, int block)
+    private static void Process_Block(byte[] data, byte[] key, byte[] iv, int block, bool is_first)
     {
         var index = block * key.Length;
-        var encrypted = Get_Block(data, key, iv, index);
+        var encrypted = Get_Block(data, key, iv, index, is_first);
         var i = 0;
         foreach (var e in encrypted)
             data[index + (i++)] = e;
     }
 
-    private static IEnumerable<byte> Get_Block(byte[] data, byte[] key, byte[] iv, int index)
+    private static IEnumerable<byte> Get_Block(byte[] data, byte[] key, byte[] iv, int index, bool is_first)
     {
-        var prev_index = index - key.Length;
         var length = Math.Min(key.Length, data.Length - index);
         for (int i = 0; i < length; i++)
-            yield return (byte)(key[i] ^ data[index + i] ^ (index == 0 ? iv[i] : data[prev_index + i]));
+        {
+            var suffix = (is_first && index == 0 ?
+                iv[i] :
+                index == 0 ?
+                    data[data.Length - key.Length + i] :
+                    data[index + i]);
+            yield return (byte)(key[i] ^ data[index + i] ^ suffix);
+        }
     }
 
     private static byte[] Get_IV(int length)
