@@ -1,37 +1,44 @@
-﻿namespace Encryption.Engine;
+﻿using System.Collections;
+
+namespace Encryption.Engine;
 
 public class Key_Decryption
 {
-    public static byte[] Decrypt(byte[] data, byte[] key, byte times)
+    public static byte[] Decrypt(byte[] data, byte[] key)
     {
-        var blocked_data = Get_Blocked_Data(data, key);
+        var blocked_data = Get_Blocked_Data(data, key.Length);
+        var times = BitConverter.ToInt32(data, data.Length - 8);
+        var org_length = BitConverter.ToInt32(data, data.Length - 4);
 
         Decrypt(blocked_data, key, times);
 
-        var decrypted = new byte[key.Length * blocked_data.Length - 2];
-        for (int block = 1; block < blocked_data.Length - 2; block++)
-            Array.Copy(blocked_data[block], 0, decrypted, (block - 1) * key.Length, key.Length);
-        return decrypted;
+        return Get_Decrypted_Data(blocked_data, org_length);
     }
 
-    private static void Decrypt(byte[][] data, byte[] key, byte times)
+    private static void Decrypt(byte[][] data, byte[] key, int times)
     {
         for (int t = 0; t < times; t++)
         {
             for (int i = data.Length - 2; i > 0; i--)
             {
-                var prev = data[i + 1];
-                if (t != 0 && i == data.Length - 2)
-                    prev = data[1];
+                var prev = Get_Prev_Block(data, times, t, i);
                 Decrypt_Block(data[i], key, prev);
             }
         }
-        Decrypt_Block(data[1], key, data[0]);
     }
 
-    private static byte[][] Get_Blocked_Data(byte[] data, byte[] key)
+    private static byte[] Get_Prev_Block(byte[][] data, int times, int t, int i)
     {
-        var block_length = key.Length;
+        if (i != 1)
+            return data[i - 1];
+        if (t == times - 1)
+            return data[0];
+        else
+            return data[^2];
+    }
+
+    private static byte[][] Get_Blocked_Data(byte[] data, int block_length)
+    {
         var blocked_data = new byte[data.Length / block_length][];
 
         for (int i = 0; i < blocked_data.Length; i++)
@@ -40,6 +47,21 @@ public class Key_Decryption
             Array.Copy(data, i * block_length, blocked_data[i], 0, block_length);
         }
         return blocked_data;
+    }
+
+    private static byte[] Get_Decrypted_Data(byte[][] blocked_data, int org_length)
+    {
+        var decrypted = new byte[org_length];
+        var block_length = blocked_data[0].Length;
+        for (int block = 1; block < blocked_data.Length - 1; block++)
+        {
+            var index = (block - 1) * block_length;
+            if (index + block_length > decrypted.Length)
+                block_length = (byte)(decrypted.Length - index);
+            Array.Copy(blocked_data[block], 0, decrypted, index, block_length);
+        }
+
+        return decrypted;
     }
 
     private static void Decrypt_Block(byte[] data, byte[] key, byte[] prev)

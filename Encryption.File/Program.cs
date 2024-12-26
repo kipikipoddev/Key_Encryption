@@ -7,6 +7,6 @@ var encrypted = Key_Encryption.Encrypt(data, key, 128);
 
 File.WriteAllBytes(".\\Advanced_Encryption_Standard.enc", encrypted);
 
-var decrypted = Key_Decryption.Decrypt(encrypted, key, 128);
+var decrypted = Key_Decryption.Decrypt(encrypted, key);
 
-File.WriteAllBytes(".\\Advanced_Encryption_Standard_dyc.pdf", encrypted);
+File.WriteAllBytes(".\\Advanced_Encryption_Standard_dyc.pdf", decrypted);

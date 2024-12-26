@@ -31,6 +31,6 @@ public class Benchmarks
     [Benchmark]
     public void Decrypt()
     {
-        Key_Decryption.Decrypt(encrypted, key, Times);
+        Key_Decryption.Decrypt(encrypted, key);
     }
 }
