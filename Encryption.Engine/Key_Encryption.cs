@@ -2,65 +2,60 @@
 
 namespace Encryption.Engine;
 
-public class Key_Encryption
+public class Key_Encryption : Base_Key
 {
     public static byte[] Encrypt(byte[] data, byte[] key, int times)
     {
-        var blocked_data = Get_Blocked_Data(data, key, times);
+        var block_size = key.Length;
+        var org_length = data.Length;
+        var padding = org_length % block_size;
+        var length = org_length + padding;
 
-        Encrypt_Blocked_Data(blocked_data, key, times);
+        Array.Resize(ref data, length + block_size * 2 + 8);
+        Add_Metadata(data, times, block_size, org_length, length);
 
-        Encrypt_Block(blocked_data[^2], key, blocked_data[^3]);
+        Encrypt_Data(data, key, times, length, block_size);
 
-        return blocked_data.SelectMany(innerArray => innerArray).ToArray();
+        XOr_Block(data, length + block_size, length - block_size, key);
+        return data;
     }
 
-    private static void Encrypt_Blocked_Data(byte[][] data, byte[] key, int times)
+    private static void Encrypt_Data(byte[] data, byte[] key, int times, int length, int block_size)
     {
-        for (int t = 0; t < times; t++)
-            for (int i = 1; i < data.Length - 2; i++)
-                Encrypt_Block(data[i], key, (t != 0 && i == 1) ? data[^3] : data[i - 1]);
+        var blocks = length / block_size;
+        for (int time_index = 0; time_index < times; time_index++)
+            for (int block_index = 0; block_index < blocks; block_index++)
+                Encrypt_Block(data, key, length, block_size, block_index, time_index == 0);
     }
 
-    private static byte[][] Get_Blocked_Data(byte[] data, byte[] key, int times)
+    private static void Encrypt_Block(byte[] data, byte[] key, int data_length, int block_size, int block_index, bool is_first_time)
     {
-        var block_length = key.Length;
-        var blocked_data = new byte[(data.Length / block_length) + 4][];
-        Copy_Data(data, block_length, blocked_data);
-        Add_Meta_Data(data, times, block_length, blocked_data);
-        return blocked_data;
+        var prev_index = Get_Prev_Index(data_length, block_size, block_index, is_first_time);
+        XOr_Block(data, block_index * block_size, prev_index, key);
     }
 
-    private static void Add_Meta_Data(byte[] data, int times, int block_length, byte[][] blocked_data)
+    private static int Get_Prev_Index(int data_length, int block_size, int block_index, bool is_first_time)
     {
-        blocked_data[0] = Get_IV(block_length);
-        blocked_data[^2] = new byte[block_length];
-        blocked_data[^1] = [.. BitConverter.GetBytes(times), .. BitConverter.GetBytes(data.Length)];
+        if (block_index == 0)
+            if (is_first_time)
+                return data_length;
+            else
+                return data_length - block_size;
+        return (block_index - 1) * block_size;
     }
 
-    private static void Copy_Data(byte[] data, int block_length, byte[][] blocked_data)
+    private static void Add_Metadata(byte[] data, int times, int block_size, int org_length, int length)
     {
-        for (int i = 1; i < blocked_data.Length - 2; i++)
-        {
-            blocked_data[i] = new byte[block_length];
-            var length = Math.Min(block_length, data.Length - (i - 1) * block_length);
-            Array.Copy(data, (i - 1) * block_length, blocked_data[i], 0, length);
-        }
-    }
-
-    private static void Encrypt_Block(byte[] data, byte[] key, byte[] prev)
-    {
-        for (int i = 0; i < data.Length; i++)
-            data[i] = (byte)(data[i] ^ prev[i] ^ key[i]);
+        Array.Copy(Get_IV(block_size), 0, data, length, block_size);
+        Array.Copy(BitConverter.GetBytes(org_length), 0, data, length + block_size * 2, 4);
+        Array.Copy(BitConverter.GetBytes(times), 0, data, length + block_size * 2 + 4, 4);
     }
 
     private static byte[] Get_IV(int length)
     {
         var randomBytes = new byte[length];
         using (var rng = RandomNumberGenerator.Create())
-        {
             rng.GetBytes(randomBytes);
-        }
         return randomBytes;
     }
 }

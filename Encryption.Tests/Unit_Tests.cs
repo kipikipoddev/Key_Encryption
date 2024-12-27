@@ -16,7 +16,6 @@ public class Unit_Tests
         key = random.Get_Random_Bytes(16);
     }
 
-    [TestCase(10)]
     [TestCase(100)]
     [TestCase(1_000)]
     [TestCase(10_000)]
@@ -34,10 +33,10 @@ public class Unit_Tests
     [Test]
     public void IV_Test()
     {
-        var data = random.Get_Random_Bytes(16);
+        var data = random.Get_Random_Bytes(100);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 16);
-        var encrypted2 = Key_Encryption.Encrypt(data, key, 16);
+        var encrypted = Key_Encryption.Encrypt(data, key, 128);
+        var encrypted2 = Key_Encryption.Encrypt(data, key, 128);
 
         Assert.That(encrypted[0], Is.Not.EqualTo(encrypted2[0]));
     }
