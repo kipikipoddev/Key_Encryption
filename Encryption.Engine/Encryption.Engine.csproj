@@ -7,8 +7,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Encryption.Common\Encryption.Common.csproj" />
-  </ItemGroup>
-
 </Project>

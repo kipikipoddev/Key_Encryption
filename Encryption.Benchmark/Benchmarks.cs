@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Encryption.Common;
 using Encryption.Engine;
 
 namespace Encryption.Benchmark;
@@ -17,8 +16,8 @@ public class Benchmarks
     public Benchmarks()
     {
         random = new();
-        key = random.Get_Random_Bytes(16);
-        data = random.Get_Random_Bytes(Scale);
+        key = Get_Random_Bytes(16);
+        data = Get_Random_Bytes(Scale);
         encrypted = Key_Encryption.Encrypt(data, key, Times);
     }
 
@@ -32,5 +31,12 @@ public class Benchmarks
     public void Decrypt()
     {
         Key_Decryption.Decrypt(encrypted, key);
+    }
+
+    private byte[] Get_Random_Bytes(int size)
+    {
+        var bytes = new byte[size];
+        random.NextBytes(bytes);
+        return bytes;
     }
 }

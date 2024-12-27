@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Encryption.Common\Encryption.Common.csproj" />
     <ProjectReference Include="..\Encryption.Engine\Encryption.Engine.csproj" />
   </ItemGroup>
 
