@@ -46,9 +46,9 @@ public class Key_Encryption : Base_Key
 
     private static void Add_Metadata(byte[] data, int times, int block_size, int org_length, int length)
     {
-        Array.Copy(Get_IV(block_size), 0, data, length, block_size);
-        Array.Copy(BitConverter.GetBytes(org_length), 0, data, length + block_size * 2, 4);
-        Array.Copy(BitConverter.GetBytes(times), 0, data, length + block_size * 2 + 4, 4);
+        Buffer.BlockCopy(Get_IV(block_size), 0, data, length, block_size);
+        Buffer.BlockCopy(BitConverter.GetBytes(org_length), 0, data, length + block_size * 2, 4);
+        Buffer.BlockCopy(BitConverter.GetBytes(times), 0, data, length + block_size * 2 + 4, 4);
     }
 
     private static byte[] Get_IV(int length)
