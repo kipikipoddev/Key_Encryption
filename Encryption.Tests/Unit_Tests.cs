@@ -1,6 +1,4 @@
-﻿using Encryption.Common;
-using Encryption.Engine;
-using System.Collections;
+﻿using Encryption.Engine;
 
 namespace Encryption.Tests;
 
@@ -13,7 +11,7 @@ public class Unit_Tests
     public void Setup()
     {
         random = new();
-        key = random.Get_Random_Bytes(16);
+        key = Get_Random_Bytes(16);
     }
 
     [TestCase(100)]
@@ -22,7 +20,7 @@ public class Unit_Tests
     [TestCase(100_000)]
     public void Key_Encryption_Test(int length)
     {
-        var data = random.Get_Random_Bytes(length);
+        var data = Get_Random_Bytes(length);
 
         var encrypted = Key_Encryption.Encrypt(data, key, 128);
         var decrypted = Key_Decryption.Decrypt(encrypted, key);
@@ -33,11 +31,18 @@ public class Unit_Tests
     [Test]
     public void IV_Test()
     {
-        var data = random.Get_Random_Bytes(100);
+        var data = Get_Random_Bytes(100);
 
         var encrypted = Key_Encryption.Encrypt(data, key, 128);
         var encrypted2 = Key_Encryption.Encrypt(data, key, 128);
 
         Assert.That(encrypted[0], Is.Not.EqualTo(encrypted2[0]));
+    }
+
+    private byte[] Get_Random_Bytes(int size)
+    {
+        var bytes = new byte[size];
+        random.NextBytes(bytes);
+        return bytes;
     }
 }
