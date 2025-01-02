@@ -1,43 +1,26 @@
-﻿namespace Encryption.Engine;
+﻿using System.Collections;
 
-public class Key_Decryption: Base_Key
+namespace Encryption.Engine;
+
+public class Key_Decryption : Base_Key
 {
-    public static byte[] Decrypt(byte[] data, byte[] key)
+    public static byte[] Decrypt(byte[] data, byte[] key, byte block_size = 16, byte times = 10)
     {
-        var block_size = key.Length;
-        var org_length = BitConverter.ToInt32(data, data.Length - 8);
-        var times = BitConverter.ToInt32(data, data.Length - 4);
-        var padding = org_length % block_size;
-        var length = org_length + padding;
+        var key_bit = new BitArray(key);
+        var iv = data.Skip(data.Length - block_size).Take(block_size).ToArray();
+        var iv_bits = new BitArray(iv);
+        var arrays = Get_Bit_Blocks(data, data.Length - block_size, block_size).ToArray();
 
-        XOr_Block(data, length, key);
-        Decrypt(data, key, block_size, times, length);
-        Array.Resize(ref data, org_length);
+        for (int t = times - 1; t >= 0; t--)
+        {
+            for (var b = arrays.Length - 1; b >= 0; b--)
+            {
+                var last = Get_Prev(arrays, iv_bits, t, b);
+                arrays[b] = arrays[b].Xor(last).Xor(key_bit);
+            }
+        }
 
-        return data;
+        return Get_Bytes(arrays).ToArray();
     }
 
-    private static void Decrypt(byte[] data, byte[] key, int block_size, int times, int length)
-    {
-        var blocks = length / block_size;
-        for (int t = 0; t < times; t++)
-            for (var block_index = blocks - 1; block_index >= 0; block_index--)
-                Decrypt_Block(data, key, block_size, times, length, t, block_index);
-    }
-
-    private static void Decrypt_Block(byte[] data, byte[] key, int block_size, int times, int length, int t, int block_index)
-    {
-        var prev_index = Get_Prev_Index(length, block_size, block_index, t == times - 1);
-        XOr_Block(data, block_index * block_size, prev_index, key);
-    }
-
-    private static int Get_Prev_Index(int data_length, int block_size, int block_index, bool last_time)
-    {
-        if (block_index == 0)
-            if (last_time)
-                return data_length;
-            else
-                return data_length - block_size;
-        return (block_index - 1) * block_size;
-    }
 }

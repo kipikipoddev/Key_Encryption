@@ -22,7 +22,7 @@ public class Unit_Tests
     {
         var data = Get_Random_Bytes(length);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 10);
+        var encrypted = Key_Encryption.Encrypt(data, key);
         var decrypted = Key_Decryption.Decrypt(encrypted, key);
 
         Assert.That(data, Is.EqualTo(decrypted));

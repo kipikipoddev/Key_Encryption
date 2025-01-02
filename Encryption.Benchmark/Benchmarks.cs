@@ -18,13 +18,13 @@ public class Benchmarks
         random = new();
         key = Get_Random_Bytes(16);
         data = Get_Random_Bytes(Scale);
-        encrypted = Key_Encryption.Encrypt(data, key, Times);
+        encrypted = Key_Encryption.Encrypt(data, key, 16, Times);
     }
 
     [Benchmark]
     public void Encrypt()
     {
-        Key_Encryption.Encrypt(data, key, Times);
+        Key_Encryption.Encrypt(data, key, 16, Times);
     }
 
     [Benchmark]

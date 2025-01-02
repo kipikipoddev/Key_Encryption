@@ -1,55 +1,28 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections;
+using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography;
 
 namespace Encryption.Engine;
 
 public class Key_Encryption : Base_Key
 {
-    public static byte[] Encrypt(byte[] data, byte[] key, int times)
+    public static byte[] Encrypt(byte[] data, byte[] key, byte block_size = 16, int times = 10)
     {
-        var block_size = key.Length;
-        var org_length = data.Length;
-        var padding = org_length % block_size;
-        var length = org_length + padding;
+        var key_bit = new BitArray(key);
+        var iv = Get_IV(block_size);
+        var iv_bits = new BitArray(iv);
+        var arrays = Get_Bit_Blocks(data, data.Length, block_size).ToArray();
 
-        Array.Resize(ref data, length + block_size * 2 + 8);
-        Add_Metadata(data, times, block_size, org_length, length);
-
-        Encrypt_Data(data, key, times, length, block_size);
-
-        XOr_Block(data, length + block_size, length - block_size, key);
-        XOr_Block(data, length, key);
-        return data;
-    }
-
-    private static void Encrypt_Data(byte[] data, byte[] key, int times, int length, int block_size)
-    {
-        var blocks = length / block_size;
-        for (int time_index = 0; time_index < times; time_index++)
-            for (int block_index = 0; block_index < blocks; block_index++)
-                Encrypt_Block(data, key, length, block_size, block_index, time_index == 0);
-    }
-
-    private static void Encrypt_Block(byte[] data, byte[] key, int data_length, int block_size, int block_index, bool is_first_time)
-    {
-        var prev_index = Get_Prev_Index(data_length, block_size, block_index, is_first_time);
-        XOr_Block(data, block_index * block_size, prev_index, key);
-    }
-
-    private static int Get_Prev_Index(int data_length, int block_size, int block_index, bool is_first_time)
-    {
-        if (block_index == 0)
-            if (is_first_time)
-                return data_length;
-            else
-                return data_length - block_size;
-        return (block_index - 1) * block_size;
-    }
-
-    private static void Add_Metadata(byte[] data, int times, int block_size, int org_length, int length)
-    {
-        Buffer.BlockCopy(Get_IV(block_size), 0, data, length, block_size);
-        Buffer.BlockCopy(BitConverter.GetBytes(org_length), 0, data, length + block_size * 2, 4);
-        Buffer.BlockCopy(BitConverter.GetBytes(times), 0, data, length + block_size * 2 + 4, 4);
+        for (int t = 0; t < times; t++)
+        {
+            for (var b = 0; b < arrays.Length; b++)
+            {
+                var last = Get_Prev(arrays, iv_bits, t, b);
+                arrays[b] = arrays[b].Xor(last).Xor(key_bit);
+            }
+        }
+        return Get_Bytes(arrays).Concat(iv).ToArray();
     }
 
     private static byte[] Get_IV(int length)
@@ -58,5 +31,26 @@ public class Key_Encryption : Base_Key
         using (var rng = RandomNumberGenerator.Create())
             rng.GetBytes(randomBytes);
         return randomBytes;
+    }
+
+
+    private static IEnumerable<bool> Byte_To_Bits(byte input)
+    {
+        for (int i = 7; i >= 0; i--)
+            yield return (input & (1 << i)) != 0;
+    }
+
+    private static byte Bits_To_Byte(IEnumerable<bool> bits)
+    {
+        byte result = 0;
+        var i = 0;
+        foreach (var item in bits)
+        {
+            if (item)
+                result |= (byte)(1 << (7 - i));
+            i++;
+        }
+
+        return result;
     }
 }
