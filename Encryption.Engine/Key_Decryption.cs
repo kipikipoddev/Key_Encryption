@@ -10,6 +10,7 @@ public class Key_Decryption: Base_Key
         var padding = org_length % block_size;
         var length = org_length + padding;
 
+        XOr_Block(data, length, key);
         Decrypt(data, key, block_size, times, length);
         Array.Resize(ref data, org_length);
 

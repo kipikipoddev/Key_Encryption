@@ -17,6 +17,7 @@ public class Key_Encryption : Base_Key
         Encrypt_Data(data, key, times, length, block_size);
 
         XOr_Block(data, length + block_size, length - block_size, key);
+        XOr_Block(data, length, key);
         return data;
     }
 

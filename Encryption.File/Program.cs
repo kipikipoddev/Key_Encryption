@@ -3,7 +3,7 @@
 var data = File.ReadAllBytes(".\\Advanced_Encryption_Standard.pdf");
 var key = Guid.NewGuid().ToByteArray();
 
-var encrypted = Key_Encryption.Encrypt(data, key, 128);
+var encrypted = Key_Encryption.Encrypt(data, key, 10);
 
 File.WriteAllBytes(".\\Advanced_Encryption_Standard.enc", encrypted);
 

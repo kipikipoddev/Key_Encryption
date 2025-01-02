@@ -6,7 +6,7 @@ namespace Encryption.Benchmark;
 public class Benchmarks
 {
     private const int Scale = 1_000_000;
-    private const int Times = 128;
+    private const int Times = 10;
 
     private readonly Random random;
     private readonly byte[] key;
