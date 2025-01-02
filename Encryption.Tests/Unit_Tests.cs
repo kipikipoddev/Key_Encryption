@@ -22,7 +22,7 @@ public class Unit_Tests
     {
         var data = Get_Random_Bytes(length);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 128);
+        var encrypted = Key_Encryption.Encrypt(data, key, 10);
         var decrypted = Key_Decryption.Decrypt(encrypted, key);
 
         Assert.That(data, Is.EqualTo(decrypted));
@@ -33,8 +33,8 @@ public class Unit_Tests
     {
         var data = Get_Random_Bytes(100);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 128);
-        var encrypted2 = Key_Encryption.Encrypt(data, key, 128);
+        var encrypted = Key_Encryption.Encrypt(data, key, 10);
+        var encrypted2 = Key_Encryption.Encrypt(data, key, 10);
 
         Assert.That(encrypted[0], Is.Not.EqualTo(encrypted2[0]));
     }
