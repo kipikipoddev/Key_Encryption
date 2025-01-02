@@ -1,12 +1,13 @@
 ﻿using Encryption.Engine;
+using System.Text.Json;
 
 var data = File.ReadAllBytes(".\\Advanced_Encryption_Standard.pdf");
-var key = Guid.NewGuid().ToByteArray();
+var encrypt_data = new Encrypt_Data(data);
 
-var encrypted = Key_Encryption.Encrypt(data, key, 10);
+Key_Encryption.Encrypt(encrypt_data);
 
-File.WriteAllBytes(".\\Advanced_Encryption_Standard.enc", encrypted);
+File.WriteAllBytes(".\\Advanced_Encryption_Standard.enc", encrypt_data.Data);
 
-var decrypted = Key_Decryption.Decrypt(encrypted, key);
+Key_Decryption.Decrypt(encrypt_data);
 
-File.WriteAllBytes(".\\Advanced_Encryption_Standard_dyc.pdf", decrypted);
+File.WriteAllBytes(".\\Advanced_Encryption_Standard_dyc.pdf", encrypt_data.Data);

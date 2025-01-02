@@ -4,45 +4,53 @@ namespace Encryption.Tests;
 
 public class Unit_Tests
 {
-    private Random random;
-    private byte[] key;
-
-    [SetUp]
-    public void Setup()
-    {
-        random = new();
-        key = Get_Random_Bytes(16);
-    }
-
     [TestCase(100)]
     [TestCase(1_000)]
     [TestCase(10_000)]
     [TestCase(100_000)]
-    public void Key_Encryption_Test(int length)
+    public void Encryption_Test(int length)
     {
-        var data = Get_Random_Bytes(length);
+        var data = Randomizer.Get(length);
+        var copy = new byte[data.Length];
+        Array.Copy(data, copy, data.Length);
+        var encrypt_data = new Encrypt_Data(copy);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 10);
-        var decrypted = Key_Decryption.Decrypt(encrypted, key);
+        Key_Encryption.Encrypt(encrypt_data);
+        Key_Decryption.Decrypt(encrypt_data);
 
-        Assert.That(data, Is.EqualTo(decrypted));
+        Assert.That(data, Is.EqualTo(copy));
     }
 
     [Test]
-    public void IV_Test()
+    public void Encryption_Zeros_Test()
     {
-        var data = Get_Random_Bytes(100);
+        var encrypt_data = new Encrypt_Data(new byte[100]);
 
-        var encrypted = Key_Encryption.Encrypt(data, key, 10);
-        var encrypted2 = Key_Encryption.Encrypt(data, key, 10);
+        Key_Encryption.Encrypt(encrypt_data);
+        Key_Decryption.Decrypt(encrypt_data);
 
-        Assert.That(encrypted[0], Is.Not.EqualTo(encrypted2[0]));
+        Assert.That(new byte[100], Is.EqualTo(encrypt_data.Data));
     }
 
-    private byte[] Get_Random_Bytes(int size)
+    [Test]
+    public void Encryption_Extra_Is_Zeros_Test()
     {
-        var bytes = new byte[size];
-        random.NextBytes(bytes);
-        return bytes;
+        var encrypt_data = new Encrypt_Data(new byte[32]);
+
+        Key_Encryption.Encrypt(encrypt_data);
+
+        Assert.That(new byte[16], Is.EqualTo(encrypt_data.Extra));
     }
+
+    [Test]
+    public void Encryption_Encrypt_All_Data_Test()
+    {
+        var encrypt_data = new Encrypt_Data(new byte[100], 16, 1);
+
+        Key_Encryption.Encrypt(encrypt_data);
+
+        var last = encrypt_data.Data.Skip(100 - 4).ToArray();
+        Assert.That(new byte[4], Is.Not.EqualTo(last));
+    }
+
 }

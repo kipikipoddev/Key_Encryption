@@ -6,37 +6,25 @@ namespace Encryption.Benchmark;
 public class Benchmarks
 {
     private const int Scale = 1_000_000;
-    private const int Times = 10;
-
-    private readonly Random random;
-    private readonly byte[] key;
-    private readonly byte[] data;
-    private readonly byte[] encrypted;
+    private readonly byte[] byte_data;
 
     public Benchmarks()
     {
-        random = new();
-        key = Get_Random_Bytes(16);
-        data = Get_Random_Bytes(Scale);
-        encrypted = Key_Encryption.Encrypt(data, key, Times);
+        byte_data = Randomizer.Get(Scale);
     }
 
     [Benchmark]
     public void Encrypt()
     {
-        Key_Encryption.Encrypt(data, key, Times);
+        var data = new Encrypt_Data(byte_data);
+        Key_Encryption.Encrypt(data);
     }
 
     [Benchmark]
-    public void Decrypt()
+    public void Encrypt_And_Decrypt()
     {
-        Key_Decryption.Decrypt(encrypted, key);
-    }
-
-    private byte[] Get_Random_Bytes(int size)
-    {
-        var bytes = new byte[size];
-        random.NextBytes(bytes);
-        return bytes;
+        var data = new Encrypt_Data(byte_data);
+        Key_Encryption.Encrypt(data);
+        Key_Decryption.Decrypt(data);
     }
 }
